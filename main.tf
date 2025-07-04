@@ -9,15 +9,26 @@ resource "aws_vpc" "main" {
 }
 
 # Create Subnet for EKS (Fargate)
-resource "aws_subnet" "eks_subnet" {
+resource "aws_subnet" "eks_subnet_1" {
   vpc_id     = aws_vpc.main.id
-  cidr_block = var.subnet_cidr
+  cidr_block = var.subnet_cidr_1
   availability_zone = "eu-west-1a"
   map_public_ip_on_launch = true
   tags = {
-    Name = "my-subnet"
+    Name = "my-subnet-1"
   }
 }
+
+resource "aws_subnet" "eks_subnet_2" {
+  vpc_id     = aws_vpc.main.id
+  cidr_block = var.subnet_cidr_2
+  availability_zone = "eu-west-1b"
+  map_public_ip_on_launch = true
+  tags = {
+    Name = "my-subnet-2"
+  }
+}
+
 
 # Create IAM role for EKS Cluster
 resource "aws_iam_role" "eks_cluster" {
@@ -74,7 +85,7 @@ resource "aws_eks_cluster" "eks" {
   name     = var.eks_cluster_name
   role_arn = aws_iam_role.eks_cluster.arn
   vpc_config {
-    subnet_ids = [aws_subnet.eks_subnet.id]
+    subnet_ids = [aws_subnet.eks_subnet_1.id, aws_subnet.eks_subnet_2.id]
   }
 
   depends_on = [aws_iam_role_policy_attachment.eks_cluster_policy]
