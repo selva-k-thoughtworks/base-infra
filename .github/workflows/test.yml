@@ -20,10 +20,18 @@ jobs:
           echo "::add-mask::$TOKEN"
           echo "token=$TOKEN" >> $GITHUB_OUTPUT
       
+      - name: Install SnowSQL
+        run: |
+          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-1.2.28-linux_x86_64.bash
+          bash snowsql-1.2.28-linux_x86_64.bash
+      
       - name: Connect to Snowflake
         env:
           SNOWFLAKE_ACCOUNT: 'xp05524.eu-west-3.aws'
           SNOWFLAKE_TOKEN: ${{ steps.get-token.outputs.token }}
         run: |
-          # Use the token to authenticate to Snowflake
-          # Example using snowsql or Python connector
+          snowsql -a xp05524.eu-west-3.aws \
+                  --authenticator=oauth \
+                  --token=$SNOWFLAKE_TOKEN \
+                  -w COMPUTE_WH \
+                  -q "SELECT CURRENT_USER(), CURRENT_ROLE();"
