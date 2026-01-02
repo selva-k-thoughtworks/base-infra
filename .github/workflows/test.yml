@@ -39,6 +39,7 @@ jobs:
           conn = snowflake.connector.connect(
               account='xp05524.eu-west-3.aws',
               token='${SNOWFLAKE_TOKEN}',
+              role='GITHUB_OIDC_SPIKE_ROLE',
               authenticator='oauth',
               warehouse='COMPUTE_WH',
               database='SNOWFLAKE'
