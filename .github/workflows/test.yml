@@ -20,18 +20,33 @@ jobs:
           echo "::add-mask::$TOKEN"
           echo "token=$TOKEN" >> $GITHUB_OUTPUT
       
-      - name: Install SnowSQL
-        run: |
-          curl -O https://sfc-repo.snowflakecomputing.com/snowsql/bootstrap/1.2/linux_x86_64/snowsql-1.2.28-linux_x86_64.bash
-          bash snowsql-1.2.28-linux_x86_64.bash
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      
+      - name: Install Snowflake Connector
+        run: pip install snowflake-connector-python
       
       - name: Connect to Snowflake
         env:
           SNOWFLAKE_ACCOUNT: 'xp05524.eu-west-3.aws'
           SNOWFLAKE_TOKEN: ${{ steps.get-token.outputs.token }}
         run: |
-          snowsql -a xp05524.eu-west-3.aws \
-                  --authenticator=oauth \
-                  --token=$SNOWFLAKE_TOKEN \
-                  -w COMPUTE_WH \
-                  -q "SELECT CURRENT_USER(), CURRENT_ROLE();"
+          python << EOF
+          import snowflake.connector
+          
+          conn = snowflake.connector.connect(
+              account='xp05524.eu-west-3.aws',
+              token='${SNOWFLAKE_TOKEN}',
+              authenticator='oauth',
+              warehouse='COMPUTE_WH',
+              database='SNOWFLAKE'
+          )
+          
+          cursor = conn.cursor()
+          cursor.execute("SELECT CURRENT_USER(), CURRENT_ROLE()")
+          print(cursor.fetchone())
+          cursor.close()
+          conn.close()
+          EOF
