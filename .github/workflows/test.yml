@@ -43,14 +43,14 @@ jobs:
           
           conn = snowflake.connector.connect(
               account='xp05524.eu-west-3.aws',
-              token='${SNOWFLAKE_TOKEN}',
-              role='GITHUB_OIDC_SPIKE_ROLE',
+              token=os.environ['SNOWFLAKE_TOKEN'],
               authenticator='oauth',
               warehouse='COMPUTE_WH',
               database='SNOWFLAKE'
           )
           
           cursor = conn.cursor()
+          cursor.execute("USE ROLE GITHUB_OIDC_SPIKE_ROLE")
           cursor.execute("SELECT CURRENT_USER(), CURRENT_ROLE()")
           print(cursor.fetchone())
           cursor.close()
