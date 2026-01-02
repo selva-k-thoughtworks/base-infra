@@ -16,7 +16,7 @@ jobs:
         id: get-token
         run: |
           TOKEN=$(curl -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=https://github.com/selva-k-thoughtworks" | jq -r '.value')
+            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=https://github.com/SELVA-K-THOUGHTWORKS" | jq -r '.value')
           echo "::add-mask::$TOKEN"
           echo "token=$TOKEN" >> $GITHUB_OUTPUT
       
